@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chez Marie – Menu</title>
+<style>
+  :root {
+    --bg: #F6F7FB;
+    --ink: #14213D;
+    --muted: #55607A;
+    --blue: #1B3FA0;
+    --on-blue: #FFFFFF;
+    --red: #C81E30;
+    --btn: #C81E30;
+    --on-btn: #FFFFFF;
+    --sun: #F4B41A;
+    --on-sun: #14213D;
+    --line: #B9C1D6;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0F1530;
+      --ink: #EEF1FA;
+      --muted: #A9B2CB;
+      --blue: #93AAFF;
+      --on-blue: #0F1530;
+      --red: #FF7C88;
+      --btn: #FF7C88;
+      --on-btn: #0F1530;
+      --line: #36426E;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  /* Bande peinte façon tap-tap : l'élément mémorable de la page */
+  .bande {
+    height: 16px;
+    background: repeating-linear-gradient(
+      90deg,
+      #C81E30 0 28px,
+      #F4B41A 28px 56px,
+      #1B3FA0 56px 84px
+    );
+  }
+
+  .page { max-width: 640px; margin: 0 auto; padding: 0 20px 48px; }
+
+  header { padding: 28px 0 16px; }
+  h1 {
+    margin: 0;
+    font-family: "Arial Black", "Roboto", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 900;
+    font-size: clamp(2.6rem, 13vw, 4.4rem);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--blue);
+  }
+  .slogan { margin: 12px 0 4px; font-size: 1.125rem; }
+  .horaires { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bg);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none;
+    font: inherit;
+    font-weight: 700;
+    color: var(--blue);
+    background: transparent;
+    border: 2px solid var(--blue);
+    border-radius: 999px;
+    padding: 6px 16px;
+    cursor: pointer;
+  }
+  .chip[aria-pressed="true"] { background: var(--blue); color: var(--on-blue); }
+
+  :focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+
+  section { margin-top: 32px; }
+  h2 {
+    margin: 0 0 12px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--red);
+  }
+  ul { list-style: none; margin: 0; padding: 0; }
+  .item { padding: 12px 0; }
+  .ligne { display: flex; align-items: baseline; gap: 8px; }
+  .nom { font-weight: 700; font-size: 1.125rem; }
+  .points { flex: 1; min-width: 12px; border-bottom: 2px dotted var(--line); transform: translateY(-4px); }
+  .prix { font-weight: 800; white-space: nowrap; }
+  .desc { margin: 2px 0 0; color: var(--muted); font-size: 0.95rem; max-width: 60ch; }
+  .tag {
+    display: inline-block;
+    margin-top: 6px;
+    margin-right: 6px;
+    padding: 1px 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: var(--sun);
+    color: var(--on-sun);
+    border-radius: 999px;
+  }
+
+  footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); }
+  .commander {
+    display: inline-block;
+    background: var(--btn);
+    color: var(--on-btn);
+    font-weight: 800;
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 10px;
+  }
+  .note { margin: 16px 0 0; color: var(--muted); font-size: 0.875rem; }
+</style>
+</head>
+<body>
+<div class="bande" aria-hidden="true"></div>
+
+<div class="page">
+  <header>
+    <h1 id="nom"></h1>
+    <p class="slogan" id="slogan"></p>
+    <p class="horaires" id="horaires"></p>
+  </header>
+
+  <nav aria-label="Catégories du menu">
+    <div class="chips" id="chips"></div>
+  </nav>
+
+  <main id="contenu"></main>
+
+  <footer id="pied"></footer>
+</div>
+
+<script>
+/* ============================================================
+   MODIFIE SEULEMENT CETTE PARTIE POUR CHAQUE NOUVEAU CLIENT
+   (les plats et les prix ci-dessous sont des exemples)
+   ============================================================ */
+const MENU = {
+  nom: "Chez Marie",
+  slogan: "Cuisine haïtienne maison, tous les jours",
+  horaires: "Ouvert de 11 h à 21 h, du lundi au samedi",
+  whatsapp: "50900000000",      // numéro avec l'indicatif, sans + ni espaces. Laisse "" pour cacher le bouton
+  devise: "G",                  // G = gourdes
+  miseAJour: "octobre 2026",
+  categories: [
+    {
+      nom: "Entrées",
+      items: [
+        { nom: "Akra", desc: "Beignets de malanga, croustillants dehors, moelleux dedans", prix: 100 },
+        { nom: "Pâtés", desc: "Feuilleté garni, au choix selon l'arrivage", prix: 75 }
+      ]
+    },
+    {
+      nom: "Plats",
+      items: [
+        { nom: "Griot", desc: "Porc mariné puis frit, servi avec du pikliz", prix: 450, tags: ["Épicé"] },
+        { nom: "Poule nan sòs", desc: "Poulet mijoté en sauce créole", prix: 400 },
+        { nom: "Tasso kabrit", desc: "Chèvre fumée et frite, relevée", prix: 500, tags: ["Épicé"] },
+        { nom: "Lambi nan sòs", desc: "Lambi tendre mijoté en sauce", prix: 700 }
+      ]
+    },
+    {
+      nom: "Accompagnements",
+      items: [
+        { nom: "Diri kolé ak pwa", desc: "Riz aux haricots rouges", prix: 150, tags: ["Végé"] },
+        { nom: "Diri djondjon", desc: "Riz aux champignons noirs", prix: 200, tags: ["Végé"] },
+        { nom: "Bannann peze", desc: "Bananes plantains frites et pressées", prix: 100, tags: ["Végé"] },
+        { nom: "Pikliz", desc: "Chou et piment marinés dans le vinaigre", prix: 50, tags: ["Épicé", "Végé"] }
+      ]
+    },
+    {
+      nom: "Boissons",
+      items: [
+        { nom: "Jus de fruit frais", desc: "Selon les fruits du jour", prix: 100 },
+        { nom: "Café haïtien", desc: "Fort et parfumé", prix: 50 }
+      ]
+    }
+  ]
+};
+/* ============================================================
+   FIN DE LA PARTIE À MODIFIER
+   ============================================================ */
+
+function el(tag, classe, texte) {
+  const e = document.createElement(tag);
+  if (classe) e.className = classe;
+  if (texte !== undefined) e.textContent = texte;
+  return e;
+}
+
+function formatPrix(n) {
+  return n.toLocaleString("fr-FR") + " " + MENU.devise;
+}
+
+document.title = MENU.nom + " – Menu";
+document.getElementById("nom").textContent = MENU.nom;
+document.getElementById("slogan").textContent = MENU.slogan;
+document.getElementById("horaires").textContent = MENU.horaires;
+
+const chips = document.getElementById("chips");
+const contenu = document.getElementById("contenu");
+const sections = [];
+const boutons = [];
+
+function afficher(nomCategorie) {
+  boutons.forEach(function (b) {
+    b.setAttribute("aria-pressed", String(b.dataset.cat === nomCategorie));
+  });
+  sections.forEach(function (s) {
+    s.hidden = !(nomCategorie === "Tout" || s.dataset.cat === nomCategorie);
+  });
+}
+
+["Tout"].concat(MENU.categories.map(function (c) { return c.nom; })).forEach(function (nom) {
+  const b = el("button", "chip", nom);
+  b.type = "button";
+  b.dataset.cat = nom;
+  b.addEventListener("click", function () { afficher(nom); });
+  chips.appendChild(b);
+  boutons.push(b);
+});
+
+MENU.categories.forEach(function (cat) {
+  const s = el("section");
+  s.dataset.cat = cat.nom;
+  s.appendChild(el("h2", "", cat.nom));
+  const liste = el("ul");
+  cat.items.forEach(function (it) {
+    const li = el("li", "item");
+    const ligne = el("div", "ligne");
+    ligne.appendChild(el("span", "nom", it.nom));
+    ligne.appendChild(el("span", "points"));
+    ligne.appendChild(el("span", "prix", formatPrix(it.prix)));
+    li.appendChild(ligne);
+    if (it.desc) li.appendChild(el("p", "desc", it.desc));
+    (it.tags || []).forEach(function (t) { li.appendChild(el("span", "tag", t)); });
+    liste.appendChild(li);
+  });
+  s.appendChild(liste);
+  contenu.appendChild(s);
+  sections.push(s);
+});
+
+const pied = document.getElementById("pied");
+if (MENU.whatsapp) {
+  const a = el("a", "commander", "Commander sur WhatsApp");
+  a.href = "https://wa.me/" + MENU.whatsapp + "?text=" + encodeURIComponent("Bonjour, je voudrais commander :");
+  a.target = "_blank";
+  a.rel = "noopener";
+  pied.appendChild(a);
+}
+pied.appendChild(el("p", "note", "Prix en gourdes (" + MENU.devise + "). Menu mis à jour en " + MENU.miseAJour + "."));
+
+afficher("Tout");
+</script>
+</body>
+</html>
